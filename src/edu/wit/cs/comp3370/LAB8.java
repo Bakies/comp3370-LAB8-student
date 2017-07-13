@@ -21,16 +21,8 @@ public class LAB8 {
 	// TODO: document this method
 	public static Item[] FindDynamic(Item[] table, final int weight) {
 
-		for (Item i : table)
-			System.out.println(i);
-
 		int[][] vals = new int[table.length + 1][weight + 1];
 		int[][] ptrs = new int[table.length + 1][weight + 1];
-
-		for (int x = 0; x < ptrs.length; x++)
-			ptrs[x][0] = -3;
-		for (int y = 0; y < ptrs[0].length; y++)
-			ptrs[0][y] = -3;
 
 		for (int y = 1; y < table.length + 1; y++) {
 			for (int x = 1; x < weight + 1; x++) {
@@ -52,17 +44,11 @@ public class LAB8 {
 			}
 		}
 
-		printIntTable(vals);
-		System.out.println();
-		printIntTable(ptrs);
-
 		// Reconstruct
 		ArrayList<Item> retItems = new ArrayList<>();
 		int x = table.length, y = weight;
 		while (x > 0 && y > 0) {
-			if (ptrs[x][y] == -3) {
-				break;
-			} else if (ptrs[x][y] <= -1) {
+			if (ptrs[x][y] <= -1) {
 				x--;
 			} else {
 				retItems.add(table[ptrs[x][y]]);
@@ -76,21 +62,6 @@ public class LAB8 {
 			ret[x] = retItems.get(retItems.size() - x - 1);
 		best_value = vals[table.length][weight];
 		return ret;
-	}
-
-	public static void printIntTable(int[][] t) {
-		for (int x = 0; x < t[0].length; x++)
-			System.out.printf("%4d", x);
-		System.out.println();
-		int yIndex = 0;
-		for (int[] x : t) {
-			for (int y : x) {
-				System.out.printf("%4d", y);
-			}
-			System.out.println();
-			// System.out.printf("%4d", yIndex);
-			yIndex++;
-		}
 	}
 
 	// public static Item[]
