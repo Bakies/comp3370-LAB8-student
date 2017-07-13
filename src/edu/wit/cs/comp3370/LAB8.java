@@ -52,7 +52,7 @@ public class LAB8 {
 		int x = table.length, y = weight;
 		while (x > 0 && y > 0) {
 			if (ptrs[x][y] >= 0) {
-				retItems.add(table[ptrs[x][y]]);
+				retItems.add(0, table[ptrs[x][y]]);
 				y -= table[ptrs[x][y]].weight;
 			}
 			x--;
@@ -61,7 +61,7 @@ public class LAB8 {
 		Item[] ret = new Item[retItems.size()];
 
 		for (x = 0; x < retItems.size(); x++)
-			ret[x] = retItems.get(retItems.size() - x - 1);
+			ret[x] = retItems.get(x);
 
 		best_value = vals[table.length][weight];
 		return ret;
