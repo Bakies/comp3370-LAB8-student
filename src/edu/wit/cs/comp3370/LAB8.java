@@ -16,22 +16,22 @@ import java.util.Scanner;
 
 public class LAB8 {
 
-	final static int LEFT = 1, UP = 2;
-
 	/**
  	* Uses dynamic programming to determine the best value to hold in the 0-1 knapsack problem
  	* @return list of best items to put in the knapsack
  	* also sets static best_value to the value of the knapsack items
  	*/
 	public static Item[] FindDynamic(Item[] table, final int weight) {
+		// vals will be the calculated best value for the knapsack
 		int[][] vals = new int[table.length + 1][weight + 1];
+		// ptrs will hold the index of the item that got added to the table from or -1 if it did not add the item
 		int[][] ptrs = new int[table.length + 1][weight + 1];
 
 		for (int y = 1; y < table.length + 1; y++) {
 			for (int x = 1; x < weight + 1; x++) {
 				if (table[y - 1].weight > x) {
 					vals[y][x] = vals[y - 1][x];
-					ptrs[y][x] = -2;
+					ptrs[y][x] = -1;
 				} else {
 					int a = vals[y - 1][x];
 					int b = vals[y - 1][x - table[y - 1].weight] + table[y - 1].value;
@@ -51,7 +51,7 @@ public class LAB8 {
 		ArrayList<Item> retItems = new ArrayList<>();
 		int x = table.length, y = weight;
 		while (x > 0 && y > 0) {
-			if (ptrs[x][y] >= -1) {
+			if (ptrs[x][y] >= 0) {
 				retItems.add(table[ptrs[x][y]]);
 				y -= table[ptrs[x][y]].weight;
 			}
@@ -59,8 +59,10 @@ public class LAB8 {
 		}
 
 		Item[] ret = new Item[retItems.size()];
+
 		for (x = 0; x < retItems.size(); x++)
 			ret[x] = retItems.get(retItems.size() - x - 1);
+
 		best_value = vals[table.length][weight];
 		return ret;
 	}
