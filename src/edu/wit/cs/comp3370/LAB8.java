@@ -18,9 +18,11 @@ public class LAB8 {
 
 	final static int LEFT = 1, UP = 2;
 
-	// TODO: document this method
+	/**
+ 	* Uses dynamic programming to determine the best value to hold in the 0-1 knapsack problem
+ 	* @return 
+ 	*/
 	public static Item[] FindDynamic(Item[] table, final int weight) {
-
 		int[][] vals = new int[table.length + 1][weight + 1];
 		int[][] ptrs = new int[table.length + 1][weight + 1];
 
@@ -48,13 +50,11 @@ public class LAB8 {
 		ArrayList<Item> retItems = new ArrayList<>();
 		int x = table.length, y = weight;
 		while (x > 0 && y > 0) {
-			if (ptrs[x][y] <= -1) {
-				x--;
-			} else {
+			if (ptrs[x][y] >= -1) {
 				retItems.add(table[ptrs[x][y]]);
 				y -= table[ptrs[x][y]].weight;
-				x--;
 			}
+			x--;
 		}
 
 		Item[] ret = new Item[retItems.size()];
