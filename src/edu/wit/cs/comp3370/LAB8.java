@@ -20,7 +20,8 @@ public class LAB8 {
 
 	/**
  	* Uses dynamic programming to determine the best value to hold in the 0-1 knapsack problem
- 	* @return 
+ 	* @return list of best items to put in the knapsack
+ 	* also sets static best_value to the value of the knapsack items
  	*/
 	public static Item[] FindDynamic(Item[] table, final int weight) {
 		int[][] vals = new int[table.length + 1][weight + 1];
@@ -63,8 +64,6 @@ public class LAB8 {
 		best_value = vals[table.length][weight];
 		return ret;
 	}
-
-	// public static Item[]
 
 	/********************************************
 	 * 
