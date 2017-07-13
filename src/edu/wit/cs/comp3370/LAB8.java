@@ -16,13 +16,84 @@ import java.util.Scanner;
 
 public class LAB8 {
 
+	final static int LEFT = 1, UP = 2;
+
 	// TODO: document this method
-	public static Item[] FindDynamic(Item[] table, int weight) {
-		// TODO: implement this method
-		return null;
-		
-		// TODO: set best_value to the sum of the optimal items' values
+	public static Item[] FindDynamic(Item[] table, final int weight) {
+
+		for (Item i : table)
+			System.out.println(i);
+
+		int[][] vals = new int[table.length + 1][weight + 1];
+		int[][] ptrs = new int[table.length + 1][weight + 1];
+
+		for (int x = 0; x < ptrs.length; x++)
+			ptrs[x][0] = -3;
+		for (int y = 0; y < ptrs[0].length; y++)
+			ptrs[0][y] = -3;
+
+		for (int y = 1; y < table.length + 1; y++) {
+			for (int x = 1; x < weight + 1; x++) {
+				if (table[y - 1].weight > x) {
+					vals[y][x] = vals[y - 1][x];
+					ptrs[y][x] = -2;
+				} else {
+					int a = vals[y - 1][x];
+					int b = vals[y - 1][x - table[y - 1].weight] + table[y - 1].value;
+
+					if (a >= b) {
+						vals[y][x] = a;
+						ptrs[y][x] = -1;
+					} else {
+						vals[y][x] = b;
+						ptrs[y][x] = y - 1;
+					}
+				}
+			}
+		}
+
+		printIntTable(vals);
+		System.out.println();
+		printIntTable(ptrs);
+
+		// Reconstruct
+		ArrayList<Item> retItems = new ArrayList<>();
+		int x = table.length, y = weight;
+		while (x > 0 && y > 0) {
+			if (ptrs[x][y] == -3) {
+				break;
+			} else if (ptrs[x][y] <= -1) {
+				x--;
+			} else {
+				retItems.add(table[ptrs[x][y]]);
+				y -= table[ptrs[x][y]].weight;
+				x--;
+			}
+		}
+
+		Item[] ret = new Item[retItems.size()];
+		for (x = 0; x < retItems.size(); x++)
+			ret[x] = retItems.get(retItems.size() - x - 1);
+		best_value = vals[table.length][weight];
+		return ret;
 	}
+
+	public static void printIntTable(int[][] t) {
+		for (int x = 0; x < t[0].length; x++)
+			System.out.printf("%4d", x);
+		System.out.println();
+		int yIndex = 0;
+		for (int[] x : t) {
+			for (int y : x) {
+				System.out.printf("%4d", y);
+			}
+			System.out.println();
+			// System.out.printf("%4d", yIndex);
+			yIndex++;
+		}
+	}
+
+	// public static Item[]
 
 	/********************************************
 	 * 
@@ -32,7 +103,7 @@ public class LAB8 {
 
 	// set by calls to Find* methods
 	private static int best_value = 0;
-	
+
 	public static class Item {
 		public int weight;
 		public int value;
@@ -44,6 +115,7 @@ public class LAB8 {
 			index = i;
 		}
 
+		@Override
 		public String toString() {
 			return "(" + weight + "#, $" + value + ")"; 
 		}
@@ -56,12 +128,12 @@ public class LAB8 {
 			System.err.println("Problem size too large. Exiting");
 			System.exit(0);
 		}
-		
+
 		int nCr = 1 << table.length; // bitmask for included items
 		int bestSum = -1;
 		boolean[] bestUsed = {}; 
 		boolean[] used = new boolean[table.length];
-		
+
 		for (int i = 0; i < nCr; i++) {	// test all combinations
 			int temp = i;
 
@@ -148,7 +220,7 @@ public class LAB8 {
 
 		return ret;
 	}
-	
+
 	// finds the available item with the best value:weight ratio that fits in
 	// the knapsack
 	private static int GetGreedyBest(Item[] table, boolean[] used, int weight) {
@@ -169,8 +241,57 @@ public class LAB8 {
 	public static int getBest() {
 		return best_value;
 	}
-	
+
 	public static void main(String[] args) {
+
+		ArrayList<Item> tableList = new ArrayList<Item>();
+		try (Scanner f = new Scanner(new File("objects/small1"))) {
+			int i = 0;
+			while (f.hasNextInt())
+				tableList.add(new Item(f.nextInt(), f.nextInt(), i++));
+		} catch (IOException e) {
+			System.err.println("Cannot open file");
+			System.exit(0);
+		}
+		Item[] table = new Item[tableList.size()];
+		for (int i = 0; i < tableList.size(); i++)
+			table[i] = tableList.get(i);
+		final int knapsackSize = 20;
+		Item[] ret = null;
+
+		best_value = 0;
+		ret = FindDynamic(table, knapsackSize);
+		System.out.println("\nDynamic got " + best_value);
+		int totWeight = 0;
+		if (ret != null)
+			for (Item i : ret) {
+				System.out.printf("%s ", i);
+				totWeight += i.weight;
+			}
+		System.out.println("\nTotal Weight: " + totWeight);
+
+		best_value = 0;
+		ret = FindEnumerate(table, knapsackSize);
+		System.out.println("\nEnumerate got " + best_value);
+		totWeight = 0;
+		for (Item i : ret) {
+			System.out.printf("%s ", i);
+			totWeight += i.weight;
+		}
+		System.out.println("\nTotal Weight: " + totWeight);
+
+		best_value = 0;
+		FindGreedy(table, knapsackSize);
+		System.out.println("\nGreedy got " + best_value);
+		totWeight = 0;
+		for (Item i : ret) {
+			System.out.printf("%s ", i);
+			totWeight += i.weight;
+		}
+		System.out.println("\nTotal Weight: " + totWeight);
+
+		System.exit(0);
+
 		Scanner s = new Scanner(System.in);
 		String file1;
 		int weight = 0;
@@ -179,7 +300,7 @@ public class LAB8 {
 		file1 = s.next();
 		weight = s.nextInt();
 
-		ArrayList<Item> tableList = new ArrayList<Item>();
+		// ArrayList<Item> tableList = new ArrayList<Item>();
 
 		try (Scanner f = new Scanner(new File(file1))) {
 			int i = 0;
@@ -189,10 +310,6 @@ public class LAB8 {
 			System.err.println("Cannot open file " + file1 + ". Exiting.");
 			System.exit(0);
 		}
-
-		Item[] table = new Item[tableList.size()];
-		for (int i = 0; i < tableList.size(); i++)
-			table[i] = tableList.get(i);
 
 		String algo = s.next();
 		Item[] result = {};
