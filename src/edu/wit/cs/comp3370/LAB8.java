@@ -58,10 +58,7 @@ public class LAB8 {
 			x--;
 		}
 
-		Item[] ret = new Item[retItems.size()];
-
-		for (x = 0; x < retItems.size(); x++)
-			ret[x] = retItems.get(x);
+		Item[] ret = retItems.toArray(new Item[retItems.size()]);
 
 		best_value = vals[table.length][weight];
 		return ret;
